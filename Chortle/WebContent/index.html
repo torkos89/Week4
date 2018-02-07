@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>Chortle</title>
+  <style type = "text/css">
+   #form1{
+    background-color: #4d4d4d;
+	position: absolute;
+ 	top: 0;
+ 	right: 0;
+ 	bottom: 0;
+ 	left: 0;
+ 	z-index: 1;
+ 	cursor: row-resize;
+   }
+   
+  </style>
+ </head>
+ <body>
+  <div> 
+    <form method="post" action = "" id = "form1">
+      <input type = "text" name = "name" placeholder = "user name">
+      <input type = "submit" name = "input" value = "Log In">
+    </form>
+  </div>
+  <div id = "output"> 
+  </div>
+  <div> 
+    <form method="post" action = "" id = "form2" style = "display: none;">
+      <input type = "text" name = "name" placeholder = "message">
+      <input type = "submit" name = "input" value = "Send">
+    </form>
+  </div>
+  <script>
+  var webSocket,  form1 = document.getElementById("form1");
+  	form1.onsubmit = function(e){
+  	 e.preventDefault();
+  	 var name = e.target.children[0].value;
+  		
+  	 webSocket = new WebSocket("ws://"+location.hostname+(location.port=="80"? "" : (":"+location.port))+"/Chortle/serverA");
+  	 webSocket.onopen = function(){
+  	   webSocket.send("*()JG"+name);
+  	 }
+  	 webSocket.onmessage = function(e){
+  			let div = document.createElement("div");
+  			div.innerHTML = e.data;
+  		  document.getElementById("output").appendChild(div)
+  		  console.log(e);
+  		}
+  		webSocket.onclose = function(e){
+  			
+  		}
+  		form1.parentNode.style.display = "none";
+  		let form2 = document.getElementById("form2")
+  		form2.style.display = "block";
+  		form2.onsubmit = function(e){
+  		  e.preventDefault();
+  		  webSocket.send(form2.children[0].value);
+  		  form2.children[0].value = "";
+  		}
+  	}
+  </script>
+</body>
+</html>
